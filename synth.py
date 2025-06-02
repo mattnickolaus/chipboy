@@ -48,7 +48,7 @@ def generate_sine(data_steps = 120):
     sin_array.append(0.0)
     return sin_array
 
-def apply_envelope(wave, attack=0.01, decay=0.2, sustain_level=1, release=0.02, sample_rate=44100):
+def apply_envelope(wave, attack=0.01, decay=0.1, sustain_level=1, release=0.1, sample_rate=44100):
     length = len(wave)
     env = np.zeros(length)
 
@@ -77,39 +77,4 @@ def apply_envelope(wave, attack=0.01, decay=0.2, sustain_level=1, release=0.02, 
 
     return wave * env
 
-sine_wave = generate_custom_waveform(generate_sine(), frequency=261.63, duration=1.0, volume=2.0)
-
-saw_tooth = [0.0, 0.33, 0.66, 1]
-saw_tooth_wave = generate_custom_waveform(saw_tooth, frequency=261.63, duration=3.0)
-
-wave = generate_square_wave(261.63, duration=1.0, duty_cycle=0.5)
-noise = generate_noise(duration=0.5)
-
-new_wave = apply_envelope(wave, attack=0.0, decay=0.3, sustain_level=1, release=0.1)
-sd.play(new_wave, 44100)
-sd.wait()
-# sd.play(saw_tooth_wave, 44100)
-# time.sleep(1.0)
-# sd.play(sine_wave, 44100)
-# time.sleep(1.0)
-# sd.play(wave, 44100)
-# time.sleep(1.0)
-# sd.play(noise, 44100)
-# sd.wait()
-
-def play_drum_at_tempo(bpm, measures):
-    time_period = 60 / bpm
-    noise = generate_noise(duration=time_period)
-
-    for i in range(measures):
-        for i in range(4):
-            sd.play(noise, 44100)
-            time.sleep(time_period)
-            # time.sleep(time_period - drum_duration)
-        # time.sleep(3 * time_period)
-
-# play_drum_at_tempo(128, 4)
-
-
-# write("square.wav", 44100, wave)
 
