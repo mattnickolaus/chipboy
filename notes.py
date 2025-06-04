@@ -26,8 +26,17 @@ class NoteEvent:
             raise ValueError("Unsupported waveform")
 
         wave = apply_envelope(wave)
-
         return start_time, wave
+
+
+    def copy_with_offset_beats(self, beat_offset):
+        return NoteEvent(
+            note=self.note,
+            start_beat=self.start_beat + beat_offset,
+            duration_beats=self.duration_beats,
+            volume=self.volume,
+            waveform_type=self.waveform_type
+        )
 
 
 
