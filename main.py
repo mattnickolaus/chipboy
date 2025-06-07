@@ -12,11 +12,11 @@ def main():
 
 
     melody = Track("melody")
-    melody.add_note(NoteEvent('G4', start_beat=0, duration_beats=4, volume=0.05))
-    melody.add_note(NoteEvent('G4', start_beat=4, duration_beats=1, volume=0.05))
-    melody.add_note(NoteEvent('F4', start_beat=5, duration_beats=3, volume=0.05))
-    melody.add_note(NoteEvent('F4', start_beat=8, duration_beats=1, volume=0.05))
-    melody.add_note(NoteEvent('G4', start_beat=9, duration_beats=3, volume=0.05))
+    melody.add_note(NoteEvent('G5', start_beat=0, duration_beats=4, volume=0.05, waveform_type='sawtooth'))
+    melody.add_note(NoteEvent('G5', start_beat=4, duration_beats=1, volume=0.05, waveform_type='sawtooth'))
+    melody.add_note(NoteEvent('F5', start_beat=5, duration_beats=3, volume=0.05, waveform_type='sawtooth'))
+    melody.add_note(NoteEvent('F5', start_beat=8, duration_beats=1, volume=0.05, waveform_type='sawtooth'))
+    melody.add_note(NoteEvent('G5', start_beat=9, duration_beats=3, volume=0.05, waveform_type='sawtooth'))
 
     bass = Track("bass")
     bass.add_note(NoteEvent("C2", start_beat=0, duration_beats=0.5, volume=0.3, waveform_type='sawtooth'))

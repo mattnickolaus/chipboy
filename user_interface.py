@@ -4,6 +4,8 @@ from textual.app import App, ComposeResult
 from textual.events import Key
 from textual.widget import Widget
 from textual.widgets import Header, Footer, DataTable, Input
+from notes import NoteEvent
+from sequencer import Track, Sequencer
 
 
 class Phrases(Widget):
@@ -46,9 +48,19 @@ class Phrases(Widget):
             current_value = self.phrase.get_cell_at(self.selected_cell)
             input_widget = self.query_one("#edit_input", Input)
             input_widget.value = str(current_value)
+            input_widget.compact = True
             input_widget.display = True
+            input_widget.max_length = 3
             input_widget.focus()
-
+        if event.key == "j":
+            new_value = "C 4"
+            self.phrase.update_cell_at(self.selected_cell, new_value)
+            test = Track("test")
+            test.add_note(NoteEvent('C4', start_beat=0, duration_beats=1, volume=0.1, waveform_type='sawtooth'))
+            seq = Sequencer(bpm=120)
+            seq.add_track(test)
+            seq.play_once(1)
+            
     def on_input_submitted(self, event: Input.Submitted) -> None:
         new_value = event.value
         self.phrase.update_cell_at(self.selected_cell, new_value)
