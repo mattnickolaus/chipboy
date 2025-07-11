@@ -12,6 +12,8 @@ import numpy as np
 import threading
 import time
 
+import sequencer
+
 
 class RealTimeNotePlayer:
     """Real-time note player for immediate feedback during editing"""
@@ -103,7 +105,7 @@ class Phrases(Widget):
             if self.edit_mode:
                 status_text = "[EDIT MODE] --Edit Mode-- | <ESC> Exit"
             else:
-                status_text = "[NAVIGATION] --Normal Mode-- | <Enter> Edit Note | <Backspace> Clear Cell"
+                status_text = "[NAVIGATION] --Normal Mode-- | <Enter> Edit Note | <Backspace> Clear Cell | <P> Play Sequence"
             
             status_widget.update(status_text)
         except:
@@ -207,6 +209,10 @@ class Phrases(Widget):
                 if self.selected_cell.row < 15:  # 16 rows (0-15)
                     self.selected_cell = Coordinate(self.selected_cell.row + 1, self.selected_cell.column)
                     self.phrase.move_cursor(row=self.selected_cell.row, column=self.selected_cell.column)
+            elif event.key == "p":  # play phrase sequence
+                self.play_phrase_sequence()
+                event.stop()
+                return
             elif event.key == "e":
                 # row, col = self.selected_cell
                 current_value = self.phrase.get_cell_at(self.selected_cell)
@@ -230,11 +236,57 @@ class Phrases(Widget):
         self.phrase.update_cell_at(self.selected_cell, new_value)
         self.query_one("#edit_input", Input).display = False
 
+    def convert_table_to_track(self):
+        """Convert the current table data to a Track with 16th notes"""
+        track = Track("phrase")
+        
+        # Get all notes from the table (16 rows)
+        for row_index in range(16):
+            # Get the note from the first column (Note column)
+            note_value = self.phrase.get_cell_at(Coordinate(row_index, 0))
+            
+            # Skip empty notes (treat as rest)
+            if not note_value or note_value == "---":
+                continue
+                
+            # Each row represents a 16th note, so duration_beats = 0.25 (1/4)
+            # start_beat is the row index * 0.25
+            start_beat = row_index * 0.25
+            duration_beats = 0.25
+            
+            # Create NoteEvent and add to track
+            note_event = NoteEvent(
+                note=note_value,
+                start_beat=start_beat,
+                duration_beats=duration_beats,
+                volume=0.1,
+                waveform_type='sawtooth' # 'square'  # Default to square wave
+            )
+            track.add_note(note_event)
+        
+        return track
+
+    def play_phrase_sequence(self):
+        """Play the current phrase as a sequence"""
+        try:
+            # Convert table to track
+            track = self.convert_table_to_track()
+            
+            # Create sequencer and add track
+            sequencer = Sequencer(bpm=120)
+            sequencer.add_track(track)
+            
+            # Play the sequence (4 beats = 1 measure of 16th notes)
+            # sequencer.play_once(4)
+            sequencer.loop_output_and_play(duration=4, num_of_loops=2)
+            
+        except Exception as e:
+            print(f"Error playing phrase sequence: {e}")
 
 
 class ChipBoy(App):
     TITLE = "ChipBoy"
-    BINDINGS = [(">", "toggle_dark", "Toggle Dark Mode")]
+    BINDINGS = [("p", "play_phrase_sequence", "Play")] #, (">", "toggle_dark", "Toggle Dark Mode")]
 
     CSS = """
     DataTable {
