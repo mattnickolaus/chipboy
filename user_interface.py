@@ -103,9 +103,9 @@ class Phrases(Widget):
         try:
             status_widget = app.query_one("#status_bar", Static)
             if self.edit_mode:
-                status_text = "[EDIT MODE] --Edit Mode-- | <ESC> Exit"
+                status_text = "[EDIT MODE] | <ESC> Exit"
             else:
-                status_text = "[NAVIGATION] --Normal Mode-- | <Enter> Edit Note | <Backspace> Clear Cell | <P> Play Sequence"
+                status_text = "[NAVIGATION] | <Enter> Edit Note | <Backspace> Clear Cell | <P> Play Sequence"
             
             status_widget.update(status_text)
         except:
