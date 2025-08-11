@@ -42,7 +42,7 @@ class NoteEvent:
 # Note editing helper functions
 def parse_note(note_str):
     """Parse a note string like 'C 4' or 'C# 4' into (note_name, octave)"""
-    if not note_str or note_str == "---":
+    if not note_str or note_str == "----":
         return None, None
     
     # Handle "C 4" and "C# 4" formats
