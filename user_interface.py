@@ -191,12 +191,13 @@ class Phrases(Widget):
             
         # Clear previous highlight
         if self.current_playback_row >= 0:
-            self.phrase.get_row_at(self.current_playback_row).styles.background = None
+            # self.phrase.get_row_at(self.current_playback_row).styles.background = None
+            pass
         
         # Set new highlight
         if 0 <= row_index < 15:
             self.current_playback_row = row_index
-            self.phrase.get_row_at(row_index).styles.background = "blue"
+            # self.phrase.get_row_at(row_index).styles.background = "blue"
         else:
             self.current_playback_row = -1
 
