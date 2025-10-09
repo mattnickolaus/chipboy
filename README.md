@@ -4,9 +4,9 @@ Terminal-based chiptune composer inspired by Little Sound DJ (LSDJ)
 
 ## Rewrite: 
 
-I want to re-write my initial implementation from python to Go. To do this I'll be using the (`beep`)[https://github.com/gopxl/beep?tab=readme-ov-file] go library for playback and audio processing. `Beep` uses another library, (`Oto`)[https://github.com/ebitengine/oto], under the hood and requires the prerequisites listed at the bottom of this page. 
+I want to re-write my initial implementation from python to Go. To do this I'll be using the [`beep`](https://github.com/gopxl/beep?tab=readme-ov-file) go library for playback and audio processing. `Beep` uses another library, [`Oto`](https://github.com/ebitengine/oto), under the hood and requires the prerequisites listed at the bottom of this page. 
 
-Additionally, I want to rewrite the TUI using Charm's (`BubbleTea`)[https://github.com/charmbracelet/bubbletea] and (`Lip Gloss`)[https://github.com/charmbracelet/lipgloss] libraries.
+Additionally, I want to rewrite the TUI using Charm's [`BubbleTea`](https://github.com/charmbracelet/bubbletea) and [`Lip Gloss`](https://github.com/charmbracelet/lipgloss) libraries.
 
 
 ### Prerequisites
