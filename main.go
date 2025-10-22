@@ -2,7 +2,6 @@ package main
 
 import (
 	"math"
-	"math/rand"
 	"time"
 
 	"github.com/gopxl/beep"
@@ -58,21 +57,6 @@ func (s *SineWaveStreamer) Position() int {
 	return s.pos
 }
 
-// Implementing a Noise stream using the beep.StreamerFunc helper type (demoed in the docs)
-/*
-Notes:
-Likely won't use this as I will want a datastructure for each note type to set parameters for each note
-*/
-func Noise() beep.Streamer {
-	return beep.StreamerFunc(func(samples [][2]float64) (n int, ok bool) {
-		for i, _ := range samples {
-			samples[i][0] = 0.1 * (rand.Float64()*2 - 1)
-			samples[i][1] = 0.1 * (rand.Float64()*2 - 1)
-		}
-		return len(samples), true
-	})
-}
-
 type Queue struct {
 	streamers []beep.Streamer
 }
@@ -116,20 +100,63 @@ func main() {
 	sampleRate := beep.SampleRate(44100)
 	speaker.Init(sampleRate, sampleRate.N(time.Second/10))
 
-	freq := 440.0 // A4 note
-	amplitude := 0.5
-	duration := 1 * time.Second
+	sawA4 := Note{
+		Frequency:     440.0,
+		DurationBeats: 0.25,
+		Volume:        1,
+		Waveform:      Square,
+	}
 
-	sineStreamer := NewSineWaveStreamer(freq, amplitude, beep.Format{SampleRate: sampleRate}, duration)
+	sawC4 := Note{
+		Frequency:     261.63,
+		DurationBeats: 0.25,
+		Volume:        1,
+		Waveform:      Square,
+	}
+
+	rest := Note{
+		Frequency:     440.0,
+		DurationBeats: 0.25,
+		Volume:        1,
+		Waveform:      Rest,
+	}
+
+	halfRest := Note{
+		Frequency:     440.0,
+		DurationBeats: 2,
+		Volume:        1,
+		Waveform:      Rest,
+	}
+
+	noise := Note{
+		DurationBeats: 0.25,
+		Waveform:      Noise,
+	}
 
 	var queue Queue
-	queue.Add(NewSineWaveStreamer(261.63, amplitude, beep.Format{SampleRate: sampleRate}, duration)) // C4 note
-	queue.Add(sineStreamer)
-	queue.Add(Noise(), Noise())
+	queue.Add(sawA4.ToStreamer(120.0, sampleRate))
+	queue.Add(rest.ToStreamer(120, sampleRate))
+	queue.Add(sawA4.ToStreamer(120.0, sampleRate))
+	queue.Add(sawC4.ToStreamer(120.0, sampleRate))
+	queue.Add(rest.ToStreamer(120, sampleRate))
+	queue.Add(sawC4.ToStreamer(120.0, sampleRate))
+	queue.Add(rest.ToStreamer(120, sampleRate))
+	queue.Add(noise.ToStreamer(120, sampleRate))
+	queue.Add(halfRest.ToStreamer(120, sampleRate))
+	queue.Add(sawC4.ToStreamer(120.0, sampleRate))
+	queue.Add(rest.ToStreamer(120, sampleRate))
+	queue.Add(sawA4.ToStreamer(120.0, sampleRate))
 
 	done := make(chan bool)
-	speaker.Play(beep.Seq(beep.Take(sampleRate.N(2500*time.Millisecond), &queue), beep.Callback(func() {
+	speaker.Play(beep.Seq(beep.Take(sampleRate.N(30000*time.Millisecond), &queue), beep.Callback(func() {
 		done <- true
 	})))
 	<-done
+
+	/*
+		speaker.Play(beep.Seq(beep.Take(sampleRate.N(4000*time.Millisecond), &queue), beep.Callback(func() {
+			done <- true
+		})))
+		<-done
+	*/
 }
