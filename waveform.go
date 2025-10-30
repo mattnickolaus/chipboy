@@ -25,7 +25,7 @@ type Note struct {
 	Waveform      WaveformType
 }
 
-func (n *Note) ToStreamer(bpm float64, sampleRate beep.SampleRate) beep.Streamer {
+func (n *Note) ToStreamer(bpm float64, sampleRate beep.SampleRate) (beep.Streamer, time.Duration) {
 	duration := time.Duration((n.DurationBeats * 60 / bpm) * float64(time.Second))
 	numSamples := sampleRate.N(duration)
 
@@ -46,7 +46,7 @@ func (n *Note) ToStreamer(bpm float64, sampleRate beep.SampleRate) beep.Streamer
 		streamer, _ = generators.SineTone(sampleRate, n.Frequency)
 	}
 
-	return beep.Take(numSamples, streamer)
+	return beep.Take(numSamples, streamer), duration
 }
 
 // Implementing a Noise stream using the beep.StreamerFunc helper type (demoed in the docs)
