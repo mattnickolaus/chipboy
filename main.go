@@ -96,7 +96,8 @@ func (q *Queue) Err() error {
 	return nil
 }
 
-func sweep(streamer beep.Streamer, duration time.Duration) beep.Streamer {
+func sweep(streamer beep.Streamer, d int) beep.Streamer {
+	duration := time.Duration(d)
 	resampler := beep.ResampleRatio(4, 1, streamer)
 	go func() {
 		start := time.Now()
@@ -105,7 +106,7 @@ func sweep(streamer beep.Streamer, duration time.Duration) beep.Streamer {
 			if elapsed >= duration {
 				break
 			}
-			ratio := 1.0 + (elapsed.Seconds()/duration.Seconds())*4.0 // linear sweep from 1.0 to 2.0
+			ratio := 1.0 + (elapsed.Seconds()/duration.Seconds())*2.0 // linear sweep from 1.0 to 2.0
 			resampler.SetRatio(ratio)
 			time.Sleep(10 * time.Millisecond)
 		}
@@ -156,28 +157,28 @@ func main() {
 	sawA4 := Note{
 		Frequency:     987.767,
 		DurationBeats: 0.25,
-		Volume:        1,
+		Volume:        -6.0,
 		Waveform:      Square,
 	}
 
 	squareE6 := Note{
 		Frequency:     1318.51,
 		DurationBeats: 0.5,
-		Volume:        1,
+		Volume:        -6.0,
 		Waveform:      Square,
 	}
 
-	// sawC4 := Note{
-	// Frequency:     261.63,
-	// DurationBeats: 0.25,
-	// Volume:        1,
-	// Waveform:      Square,
-	// }
+	sawC4 := Note{
+		Frequency:     261.63,
+		DurationBeats: 2.0,
+		Volume:        -6.0,
+		Waveform:      Square,
+	}
 	//
 	rest := Note{
 		Frequency:     440.0,
 		DurationBeats: 0.25,
-		Volume:        1,
+		Volume:        0,
 		Waveform:      Rest,
 	}
 	//
@@ -193,7 +194,7 @@ func main() {
 	// Waveform:      Noise,
 	// }
 
-	var totalDuration time.Duration
+	var totalDuration int
 
 	var queue Queue
 	sawA4Stream, sawA4Duration := sawA4.ToStreamer(120.0, sampleRate)
@@ -207,6 +208,22 @@ func main() {
 	restStream, restDuration := rest.ToStreamer(120, sampleRate)
 	totalDuration += restDuration
 	queue.Add(restStream)
+
+	sawA4Stream, sawA4Duration = sawA4.ToStreamer(120.0, sampleRate)
+	totalDuration += sawA4Duration
+	queue.Add(sawA4Stream)
+
+	squareE6Stream, squareE6Duration = squareE6.ToStreamer(120.0, sampleRate)
+	totalDuration += squareE6Duration
+	queue.Add(squareE6Stream)
+
+	restStream, restDuration = rest.ToStreamer(120, sampleRate)
+	totalDuration += restDuration
+	queue.Add(restStream)
+
+	sawC4Stream, sawC4Duration := sawC4.ToStreamer(120.0, sampleRate)
+	totalDuration += sawC4Duration
+	queue.Add(sweep(sawC4Stream, sawC4Duration))
 
 	// sawA4Stream, sawA4Duration = sawA4.ToStreamer(120.0, sampleRate)
 	// queue.Add(exponentialSweep(sawA4Stream, sawA4Duration, 1.0))
@@ -265,7 +282,7 @@ func main() {
 	// queue.Add(restStream)
 
 	done := make(chan bool)
-	speaker.Play(beep.Seq(beep.Take(sampleRate.N(totalDuration), &queue), beep.Callback(func() {
+	speaker.Play(beep.Seq(beep.Take(totalDuration, &queue), beep.Callback(func() {
 		done <- true
 	})))
 	<-done

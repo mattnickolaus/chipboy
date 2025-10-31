@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gopxl/beep"
+	"github.com/gopxl/beep/effects"
 	"github.com/gopxl/beep/generators"
 )
 
@@ -25,7 +26,7 @@ type Note struct {
 	Waveform      WaveformType
 }
 
-func (n *Note) ToStreamer(bpm float64, sampleRate beep.SampleRate) (beep.Streamer, time.Duration) {
+func (n *Note) ToStreamer(bpm float64, sampleRate beep.SampleRate) (beep.Streamer, int) {
 	duration := time.Duration((n.DurationBeats * 60 / bpm) * float64(time.Second))
 	numSamples := sampleRate.N(duration)
 
@@ -45,8 +46,14 @@ func (n *Note) ToStreamer(bpm float64, sampleRate beep.SampleRate) (beep.Streame
 	default:
 		streamer, _ = generators.SineTone(sampleRate, n.Frequency)
 	}
+	volumeStreamer := &effects.Volume{
+		Streamer: streamer,
+		Base:     2,            // A natural base for exponential volume adjustment
+		Volume:   0 + n.Volume, // 0 means no change, negative decreases, positive increases
+		Silent:   false,        // Set to true to mute the output
+	}
 
-	return beep.Take(numSamples, streamer), duration
+	return beep.Take(numSamples, volumeStreamer), numSamples
 }
 
 // Implementing a Noise stream using the beep.StreamerFunc helper type (demoed in the docs)
