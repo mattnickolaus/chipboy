@@ -55,4 +55,6 @@ BSD systems are not tested well. If ALSA works, Oto should work.
 
 ![ChipBoy Screen Shot](./images/ChipBoy_Example.svg)
 
+![Rough Data Structure Map](./images/rough-data-structures-map.svg)
+
 
